@@ -1,0 +1,28 @@
+{% extends "predictor/base.html" %}
+{% block title %}Delete Prediction{% endblock %}
+{% block page_title %}Delete Prediction{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px;margin:0 auto;text-align:center;">
+    <h2>Delete Prediction</h2>
+    <p style="color:#718096;margin:1.5rem 0;">
+        Are you sure you want to delete the prediction for
+        <strong>{{ record.employee_name }}</strong>?
+    </p>
+    <p style="margin-bottom:1.5rem;">
+        {% if record.prediction == 'Leave' %}
+            <span class="badge badge-leave">Leave</span>
+        {% else %}
+            <span class="badge badge-stay">Stay</span>
+        {% endif %}
+        &nbsp; {{ record.probability|floatformat:0 }}% &nbsp; {{ record.department }}
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="btn-group" style="justify-content:center;">
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'history' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

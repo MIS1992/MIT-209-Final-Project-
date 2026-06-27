@@ -1,0 +1,124 @@
+{% extends "predictor/base.html" %}
+{% block title %}Predictive Analytics{% endblock %}
+{% block page_title %}Predictive Analytics{% endblock %}
+
+{% block content %}
+<p class="page-subtitle">Machine learning insights from the trained Random Forest model on IBM HR data.</p>
+
+<div class="stats-grid">
+    <div class="stat-card accuracy"><div class="label">Model Accuracy</div><div class="value">{{ model_metrics.accuracy }}%</div></div>
+    <div class="stat-card"><div class="label">Sample Analyzed</div><div class="value">{{ bulk.sample_size }}</div></div>
+    <div class="stat-card leave"><div class="label">Predicted to Leave</div><div class="value">{{ bulk.predicted_leave }}</div></div>
+    <div class="stat-card"><div class="label">Avg Leave Probability</div><div class="value">{{ bulk.avg_leave_probability }}%</div></div>
+</div>
+
+<div class="card">
+    <h2>Model Performance</h2>
+    <div class="performance-grid">
+        <div class="perf-item">
+            <span class="perf-label">Accuracy</span>
+            <span class="perf-value">{{ model_metrics.accuracy }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Precision</span>
+            <span class="perf-value">{{ model_metrics.precision }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Recall</span>
+            <span class="perf-value">{{ model_metrics.recall }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">F1 Score</span>
+            <span class="perf-value">{{ model_metrics.f1_score }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">ROC-AUC</span>
+            <span class="perf-value">{{ model_metrics.roc_auc }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Model Information</h2>
+    <table class="table">
+        <tr><th>Algorithm</th><td>Random Forest Classifier</td></tr>
+        <tr><th>Estimators</th><td>100 trees</td></tr>
+        <tr><th>Encoding</th><td>OneHotEncoder (categorical) + passthrough (numeric)</td></tr>
+        <tr><th>Actual Leave (sample)</th><td>{{ bulk.actual_leave }} employees</td></tr>
+        <tr><th>Model Predicted Leave</th><td>{{ bulk.predicted_leave }} employees</td></tr>
+    </table>
+</div>
+
+<div class="card-grid-2">
+    <div class="card">
+        <h2>Top Feature Importance</h2>
+        <canvas id="importanceChart" height="260"></canvas>
+    </div>
+    <div class="card">
+        <h2>Risk Level Distribution (Model Output)</h2>
+        <canvas id="riskChart" height="260"></canvas>
+    </div>
+</div>
+
+<div class="card-grid-2">
+    <div class="card">
+        <h2>Leave Probability Distribution</h2>
+        <canvas id="probChart" height="220"></canvas>
+    </div>
+    <div class="card">
+        <h2>Average Leave Risk by Department</h2>
+        <canvas id="deptRiskChart" height="220"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <h2>How Predictive Analytics Works</h2>
+    <ul class="desc-list">
+        <li>The trained Random Forest model scores each employee with a leave probability.</li>
+        <li><strong>High risk (≥75%)</strong> — strong attrition signal; retention action recommended.</li>
+        <li><strong>Medium risk (55–74%)</strong> — monitor closely and address satisfaction drivers.</li>
+        <li><strong>Low risk (&lt;55%)</strong> — employee likely to stay.</li>
+        <li>Feature importance shows which factors (overtime, income, satisfaction, tenure) drive predictions.</li>
+    </ul>
+    <a href="{% url 'predict' %}" class="btn btn-primary" style="margin-top:1rem;">Run Employee Prediction</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const importance = {{ feature_importance|safe }};
+const risk = {{ risk_distribution|safe }};
+const probHist = {{ probability_histogram|safe }};
+const deptRisk = {{ department_risk|safe }};
+
+new Chart(document.getElementById('importanceChart'), {
+    type: 'bar',
+    data: {
+        labels: importance.labels,
+        datasets: [{ label: 'Importance %', data: importance.values, backgroundColor: '#00d4ff' }]
+    },
+    options: { indexAxis: 'y', responsive: true }
+});
+new Chart(document.getElementById('riskChart'), {
+    type: 'pie',
+    data: {
+        labels: risk.labels,
+        datasets: [{ data: risk.values, backgroundColor: ['#68d391', '#f6ad55', '#fc8181'] }]
+    }
+});
+new Chart(document.getElementById('probChart'), {
+    type: 'bar',
+    data: {
+        labels: probHist.labels,
+        datasets: [{ label: 'Employees', data: probHist.values, backgroundColor: '#9f7aea' }]
+    }
+});
+new Chart(document.getElementById('deptRiskChart'), {
+    type: 'bar',
+    data: {
+        labels: deptRisk.labels,
+        datasets: [{ label: 'Avg Leave %', data: deptRisk.values, backgroundColor: '#fc8181' }]
+    },
+    options: { scales: { y: { beginAtZero: true, max: 100 } } }
+});
+</script>
+{% endblock %}

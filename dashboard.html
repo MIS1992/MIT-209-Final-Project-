@@ -1,0 +1,86 @@
+{% extends "predictor/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Total Predictions</div>
+        <div class="value">{{ total_predictions }}</div>
+    </div>
+    <div class="stat-card stay">
+        <div class="label">Predicted to Stay</div>
+        <div class="value">{{ stay_count }}</div>
+    </div>
+    <div class="stat-card leave">
+        <div class="label">Predicted to Leave</div>
+        <div class="value">{{ leave_count }}</div>
+    </div>
+    <div class="stat-card accuracy">
+        <div class="label">Model Accuracy</div>
+        <div class="value">{{ model_metrics.accuracy }}%</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Model Performance</h2>
+    <div class="performance-grid">
+        <div class="perf-item">
+            <span class="perf-label">Accuracy</span>
+            <span class="perf-value">{{ model_metrics.accuracy }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Precision</span>
+            <span class="perf-value">{{ model_metrics.precision }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">Recall</span>
+            <span class="perf-value">{{ model_metrics.recall }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">F1 Score</span>
+            <span class="perf-value">{{ model_metrics.f1_score }}%</span>
+        </div>
+        <div class="perf-item">
+            <span class="perf-label">ROC-AUC</span>
+            <span class="perf-value">{{ model_metrics.roc_auc }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Recent Predictions</h2>
+    {% if recent_predictions %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Prediction</th>
+                <th>Probability</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in recent_predictions %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.employee_name }}</td>
+                <td>
+                    {% if r.prediction == 'Leave' %}
+                        <span class="badge badge-leave">Leave</span>
+                    {% else %}
+                        <span class="badge badge-stay">Stay</span>
+                    {% endif %}
+                </td>
+                <td>{{ r.probability|floatformat:0 }}%</td>
+                <td>{{ r.created_at|date:"M d, Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color:#718096;">No predictions yet. <a href="{% url 'predict' %}" style="color:#0099cc;">Make your first prediction</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}

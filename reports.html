@@ -1,0 +1,42 @@
+{% extends "predictor/base.html" %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Daily Predictions ({{ today }})</div>
+        <div class="value">{{ daily_count }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Monthly Predictions</div>
+        <div class="value">{{ monthly_count }}</div>
+    </div>
+    <div class="stat-card stay">
+        <div class="label">Monthly — Stay</div>
+        <div class="value">{{ monthly_stay }}</div>
+    </div>
+    <div class="stat-card leave">
+        <div class="label">Monthly — Leave</div>
+        <div class="value">{{ monthly_leave }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Daily Report — {{ today }}</h2>
+    <p style="color:#718096;margin-bottom:1rem;">Export all predictions made today.</p>
+    <div class="btn-group">
+        <a href="{% url 'export_pdf' 'daily' %}" class="btn btn-primary">Export to PDF</a>
+        <a href="{% url 'export_excel' 'daily' %}" class="btn btn-secondary">Export to Excel</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Monthly Report — {{ month_start|date:"F Y" }}</h2>
+    <p style="color:#718096;margin-bottom:1rem;">Export all predictions from this month.</p>
+    <div class="btn-group">
+        <a href="{% url 'export_pdf' 'monthly' %}" class="btn btn-primary">Export to PDF</a>
+        <a href="{% url 'export_excel' 'monthly' %}" class="btn btn-secondary">Export to Excel</a>
+    </div>
+</div>
+{% endblock %}

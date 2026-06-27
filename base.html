@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Employee Attrition{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="navbar-brand">IBM HR</div>
+        <nav class="navbar-menu">
+            <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{% url 'diagnostic_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'diagnostic_analytics' %}active{% endif %}">Diagnostic</a>
+            <a href="{% url 'predictive_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'predictive_analytics' %}active{% endif %}">Predictive</a>
+            <a href="{% url 'predict' %}" class="nav-item {% if request.resolver_match.url_name == 'predict' %}active{% endif %}">Predict</a>
+            <a href="{% url 'history' %}" class="nav-item {% if request.resolver_match.url_name == 'history' %}active{% endif %}">History</a>
+            <a href="{% url 'reports' %}" class="nav-item {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">Reports</a>
+            <a href="{% url 'logout' %}" class="nav-item">Logout</a>
+        </nav>
+    </header>
+
+    <main class="page">
+        <div class="page-header">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            <span class="user-info">
+                {{ request.user.username }}
+                {% if request.user.role == 'admin' %}(Admin){% else %}(HR Staff){% endif %}
+            </span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,96 @@
+{% extends "predictor/base.html" %}
+{% block title %}Diagnostic Analytics{% endblock %}
+{% block page_title %}Diagnostic Analytics{% endblock %}
+
+{% block content %}
+<p class="page-subtitle">Descriptive analysis of IBM HR historical data and saved prediction records.</p>
+
+<div class="stats-grid">
+    <div class="stat-card"><div class="label">Dataset Employees</div><div class="value">{{ overview.total_employees }}</div></div>
+    <div class="stat-card leave"><div class="label">Attrition Rate</div><div class="value">{{ overview.attrition_rate }}%</div></div>
+    <div class="stat-card"><div class="label">Saved Predictions</div><div class="value">{{ history_stats.total }}</div></div>
+    <div class="stat-card accuracy"><div class="label">Avg Prediction Confidence</div><div class="value">{{ history_stats.avg_probability }}%</div></div>
+</div>
+
+<div class="card-grid-2">
+    <div class="card">
+        <h2>Attrition Rate by Department</h2>
+        <canvas id="deptChart" height="220"></canvas>
+    </div>
+    <div class="card">
+        <h2>Attrition vs Overtime</h2>
+        <canvas id="overtimeChart" height="220"></canvas>
+    </div>
+</div>
+
+<div class="card-grid-2">
+    <div class="card">
+        <h2>Age Distribution (Stay vs Leave)</h2>
+        <canvas id="ageChart" height="220"></canvas>
+    </div>
+    <div class="card">
+        <h2>Satisfaction Scores Comparison</h2>
+        <canvas id="satisfactionChart" height="220"></canvas>
+    </div>
+</div>
+
+<div class="card-grid-2">
+    <div class="card">
+        <h2>Median Monthly Income</h2>
+        <canvas id="incomeChart" height="220"></canvas>
+    </div>
+    <div class="card">
+        <h2>Predictions by Department (History)</h2>
+        <canvas id="historyDeptChart" height="220"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const deptData = {{ dept_attrition|safe }};
+const overtimeData = {{ overtime_attrition|safe }};
+const ageData = {{ age_distribution|safe }};
+const satData = {{ satisfaction|safe }};
+const incomeData = {{ income|safe }};
+const historyDept = {{ history_dept|safe }};
+
+new Chart(document.getElementById('deptChart'), {
+    type: 'bar',
+    data: { labels: deptData.labels, datasets: [{ label: 'Attrition %', data: deptData.values, backgroundColor: '#fc8181' }] },
+    options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+});
+new Chart(document.getElementById('overtimeChart'), {
+    type: 'doughnut',
+    data: { labels: overtimeData.labels, datasets: [{ data: overtimeData.values, backgroundColor: ['#68d391', '#fc8181'] }] }
+});
+new Chart(document.getElementById('ageChart'), {
+    type: 'bar',
+    data: {
+        labels: ageData.labels,
+        datasets: [
+            { label: 'Stay', data: ageData.stay, backgroundColor: '#68d391' },
+            { label: 'Leave', data: ageData.leave, backgroundColor: '#fc8181' }
+        ]
+    },
+    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
+});
+new Chart(document.getElementById('satisfactionChart'), {
+    type: 'radar',
+    data: {
+        labels: satData.labels,
+        datasets: [
+            { label: 'Stay', data: satData.stay, borderColor: '#68d391', backgroundColor: 'rgba(104,211,145,0.2)' },
+            { label: 'Leave', data: satData.leave, borderColor: '#fc8181', backgroundColor: 'rgba(252,129,129,0.2)' }
+        ]
+    }
+});
+new Chart(document.getElementById('incomeChart'), {
+    type: 'bar',
+    data: { labels: incomeData.labels, datasets: [{ label: 'Median Income', data: incomeData.values, backgroundColor: ['#68d391', '#fc8181'] }] }
+});
+new Chart(document.getElementById('historyDeptChart'), {
+    type: 'pie',
+    data: { labels: historyDept.labels.length ? historyDept.labels : ['No data'], datasets: [{ data: historyDept.values.length ? historyDept.values : [1], backgroundColor: ['#00d4ff','#9f7aea','#f6ad55','#68d391','#fc8181'] }] }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "predictor/base.html" %}
+{% block title %}Employee Prediction{% endblock %}
+{% block page_title %}Employee Prediction{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Enter Employee Details</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for section in form.get_section_fields %}
+        <div class="section-title">{{ section.title }}</div>
+        <div class="form-grid">
+            {% for field in section.fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div style="margin-top:1.5rem;text-align:center;">
+            <button type="submit" class="btn btn-primary">Predict Attrition</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

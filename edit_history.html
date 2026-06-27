@@ -1,0 +1,29 @@
+{% extends "predictor/base.html" %}
+{% block title %}Edit Prediction{% endblock %}
+{% block page_title %}Edit Prediction{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Edit Prediction — {{ record.employee_name }}</h2>
+    <p style="color:#718096;margin-bottom:1.5rem;">Update employee details and re-run the prediction.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% for section in form.get_section_fields %}
+        <div class="section-title">{{ section.title }}</div>
+        <div class="form-grid">
+            {% for field in section.fields %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="btn-group" style="margin-top:1.5rem;">
+            <button type="submit" class="btn btn-primary">Save &amp; Re-predict</button>
+            <a href="{% url 'history' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

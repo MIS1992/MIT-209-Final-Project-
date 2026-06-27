@@ -1,0 +1,55 @@
+{% extends "predictor/base.html" %}
+{% block title %}Prediction Result{% endblock %}
+{% block page_title %}Prediction Result{% endblock %}
+
+{% block content %}
+<div class="card result-card">
+    <h2 style="margin-bottom:1.5rem;">Prediction Result</h2>
+
+    <p class="result-detail">Employee Name</p>
+    <p style="font-size:1.25rem;font-weight:600;margin-bottom:1.5rem;">{{ record.employee_name }}</p>
+
+    {% if record.prediction == 'Leave' %}
+        <div class="result-icon">⚠️</div>
+        <div class="result-prediction leave">{{ record.display_prediction }}</div>
+    {% else %}
+        <div class="result-icon">✅</div>
+        <div class="result-prediction stay">{{ record.display_prediction }}</div>
+    {% endif %}
+
+    <p class="result-detail">Probability</p>
+    <p class="result-prob">{{ record.probability|floatformat:0 }}%</p>
+
+    {% if record.prediction == 'Leave' %}
+    <p class="result-detail">Risk Level</p>
+    <p>
+        {% if record.risk_level == 'HIGH' %}
+            <span class="badge badge-high" style="font-size:1rem;padding:0.4rem 1rem;">HIGH</span>
+        {% elif record.risk_level == 'MEDIUM' %}
+            <span class="badge badge-medium" style="font-size:1rem;padding:0.4rem 1rem;">MEDIUM</span>
+        {% else %}
+            <span class="badge badge-low" style="font-size:1rem;padding:0.4rem 1rem;">LOW</span>
+        {% endif %}
+    </p>
+    {% endif %}
+
+    <div class="btn-group" style="justify-content:center;margin-top:2rem;">
+        <a href="{% url 'predict' %}" class="btn btn-primary">Predict Another</a>
+        <a href="{% url 'history' %}" class="btn btn-secondary">View History</a>
+    </div>
+</div>
+
+{% if record.employee_data %}
+<div class="card" style="max-width:900px;margin:1.5rem auto 0;">
+    <h2>Saved Employee Data</h2>
+    <div class="form-grid">
+        {% for key, value in record.employee_data.items %}
+        <div class="form-group">
+            <label>{{ key }}</label>
+            <p style="padding:0.6rem 0.75rem;background:#f7fafc;border-radius:6px;font-size:0.9rem;">{{ value }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
